@@ -1,1 +1,14 @@
 const releasesUrl="https://api.github.com/repos/ovelhaohb/ovelhaohb-hub-idle/releases";const patterns={windows:/(windows|win32|win64|win-x64|setup.*\.exe|\.msi$)/i,macos:/(macos|mac-os|darwin|apple|\.dmg$|\.pkg$)/i,linux:/(linux|\.appimage$|\.deb$|\.rpm$|\.tar\.gz$)/i};async function loadReleases(){const status=document.getElementById("release-status");try{const response=await fetch(releasesUrl,{headers:{"Accept":"application/vnd.github+json"}});if(!response.ok)throw Error();const releases=await response.json();const release=releases.find(x=>!x.draft&&!x.prerelease)||releases.find(x=>!x.draft);if(!release)throw Error();let found=0;for(const os of Object.keys(patterns)){const asset=(release.assets||[]).find(f=>patterns[os].test(f.name));const button=document.getElementById(os+"-download"),note=document.getElementById(os+"-note");button.href=asset?asset.browser_download_url:release.html_url;if(asset){found++;note.textContent="Versão: "+(release.tag_name||release.name||"mais recente")+" · "+asset.name}else note.textContent="Ver arquivos na página Releases"}status.textContent=found?"Versão detectada: "+(release.tag_name||release.name||"mais recente")+". Se o arquivo do seu sistema não aparecer, consulte todas as opções no GitHub.":"Não foi possível identificar automaticamente os pacotes por sistema. Use a página oficial de Releases para escolher o arquivo correto."}catch(e){status.textContent="Não foi possível carregar os arquivos automaticamente. Os botões levam à página oficial de Releases."}}loadReleases();const toggle=document.querySelector(".menu-toggle"),nav=document.querySelector(".nav");toggle?.addEventListener("click",()=>{const open=nav.classList.toggle("open");toggle.setAttribute("aria-expanded",String(open))});nav?.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{nav.classList.remove("open");toggle?.setAttribute("aria-expanded","false")}));
+// Visitor counter badge: a third-party public counter compatible with static hosting.
+// The namespace and page_id are fixed so the counter remains cumulative between deployments.
+(function setupVisitorBadge(){
+  const badge = document.getElementById("visitor-badge");
+  if (!badge) return;
+  const base = "https://visitor-badge.one9x.com/badge?page_id=ovelhaohb-hub-site&namespace=ovelhahb&left_text=TOTAL&left_color=%23050B20&right_color=%23A000FF";
+  badge.src = base + "&t=" + Date.now();
+  badge.addEventListener("error", () => {
+    const note = document.querySelector(".visitor-counter-note");
+    if (note) note.textContent = "contador temporariamente indisponível";
+    badge.style.display = "none";
+  }, {once:true});
+})();
